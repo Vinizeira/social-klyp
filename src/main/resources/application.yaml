@@ -1,3 +1,15 @@
 spring:
   application:
     name: social-klyp
+
+jwt:
+  secret: your-secret-key-here-min-256-bits
+  expireIn: 86400000
+  refreshExpireIn: 604800000
+
+app:
+  init-user:
+    enabled: true
+    username: admin
+    email: admin@socialklyp.com
+    password: 12345678
