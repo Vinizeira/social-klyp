@@ -4,6 +4,7 @@ import com.github.devlucasjava.socialklyp.application.dto.request.auth.RegisterD
 import com.github.devlucasjava.socialklyp.application.dto.response.user.UserDTO;
 import com.github.devlucasjava.socialklyp.domain.entity.User;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {

@@ -5,20 +5,23 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicInsert;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Getter
+@DynamicInsert
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(
         name = "follows",
         uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"follower_id", "following_id"})
-})
+                @UniqueConstraint(columnNames = {"follower_id", "following_id"})
+        })
 public class Follow {
 
     @Id
@@ -33,5 +36,7 @@ public class Follow {
     @JoinColumn(name = "following_id", nullable = false)
     private Profile following;
 
-    private Instant createdAt = Instant.now();
+    @Column(nullable = false, updatable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 }

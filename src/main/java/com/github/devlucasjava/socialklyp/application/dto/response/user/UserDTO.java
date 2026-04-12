@@ -38,4 +38,7 @@ public class UserDTO {
 
     @Schema(description = "Account creation date", example = "2026-01-01T10:15:30")
     private LocalDateTime createdAt;
+
+    @Schema(description = "Account update date", example = "2026-01-01T10:15:30")
+    private LocalDateTime updatedAt;
 }

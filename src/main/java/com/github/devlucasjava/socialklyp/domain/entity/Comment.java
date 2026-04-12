@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @AllArgsConstructor
+@DynamicInsert
 @NoArgsConstructor
 public class Comment {
 
@@ -29,11 +31,11 @@ public class Comment {
     @JoinColumn(name = "profile_id", nullable = false)
     private Profile profile;
 
-    @CreationTimestamp
     @Column(nullable = false, updatable = false)
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
     @Column(nullable = false)
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 }

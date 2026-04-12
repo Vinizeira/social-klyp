@@ -2,10 +2,30 @@ spring:
   application:
     name: social-klyp
 
+  datasource:
+    url: jdbc:h2:mem:db
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+server:
+  port: 8888
+  servlet:
+#    context-path:
 jwt:
-  secret: your-secret-key-here-min-256-bits
-  expireIn: 86400000
-  refreshExpireIn: 604800000
+  secret: mySecretKey123456789012345678901234567890mySecretKey123456789012345678901234567890
+  expireIn: 3600
+  refreshExpireIn: 7200
 
 app:
   init-user:

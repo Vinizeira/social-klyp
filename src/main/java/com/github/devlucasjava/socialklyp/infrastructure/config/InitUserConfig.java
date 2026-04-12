@@ -39,7 +39,7 @@ public class InitUserConfig  implements CommandLineRunner {
         user.setBirthDay(LocalDate.now());
         user.setUsername(properties.getUsername());
         user.setPassword(passwordEncoder.encode(properties.getPassword()));
-        user.setRole(Set.of(Role.ADMIN, Role.USER));
+        user.setRoles(Set.of(Role.ADMIN, Role.USER));
         userRepository.save(user);
 
     }

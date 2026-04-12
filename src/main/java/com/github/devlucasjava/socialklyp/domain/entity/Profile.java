@@ -26,7 +26,6 @@ public class Profile {
     @Column(nullable = false)
     private String bio;
 
-    @Column(nullable = false)
     private String profilePictureUrl;
 
     private boolean isPrivate = false;
