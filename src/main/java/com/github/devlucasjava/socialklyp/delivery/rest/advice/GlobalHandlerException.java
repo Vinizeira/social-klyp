@@ -68,6 +68,11 @@ public class GlobalHandlerException {
         return build(HttpStatus.UNAUTHORIZED, ex.getMessage(), null);
     }
 
+    @ExceptionHandler(InvalidOrExpiredTokenException.class)
+    public ResponseEntity<ResponseErrorsDTO> handleInvalidOrExpiredTokenException(InvalidOrExpiredTokenException ex) {
+        return build(HttpStatus.UNAUTHORIZED, ex.getMessage(), null);
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ResponseErrorsDTO> handleResourceNotFoundException(ResourceNotFoundException ex) {
         return build(HttpStatus.NOT_FOUND, ex.getMessage(), null);
