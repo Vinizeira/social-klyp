@@ -24,121 +24,102 @@ Rede social moderna construída com **Java + Spring Boot + Clean Architecture + 
 # 🧱 Estrutura do Projeto
 
 ```bash
-social-klyp-backend/
+social-klyp/
 │
-├── src/main/java/com/socialklyp/
+├── src/main/java/com/github/devlucasjava/socialklyp/
 │
-├── SocialKlypApplication.java
+│   ├── Application.java
 │
-├── domain/
-│   ├── entity/
-│   │   ├── User.java
-│   │   ├── Post.java
-│   │   ├── Comment.java
-│   │   ├── Like.java
-│   │   ├── Payment.java
-│   │   └── Notification.java
-│   │
-│   ├── enums/
-│   │   ├── Role.java
-│   │   ├── PostVisibility.java
-│   │   ├── PaymentStatus.java
-│   │   └── NotificationType.java
-│   │
-│   └── exception/
-│       ├── DomainException.java
-│       ├── NotFoundException.java
-│       └── UnauthorizedException.java
-│
-├── application/
-│   ├── dto/
-│   │   ├── request/
-│   │   │   ├── LoginRequestDTO.java
-│   │   │   ├── CreateUserDTO.java
-│   │   │   ├── CreatePostDTO.java
-│   │   │   └── PaymentRequestDTO.java
+│   ├── domain/
+│   │   ├── entity/
+│   │   │   ├── User.java
+│   │   │   ├── Profile.java
+│   │   │   ├── Post.java
+│   │   │   ├── Comment.java
+│   │   │   ├── Like.java
+│   │   │   ├── Follow.java
+│   │   │   ├── Media.java
 │   │   │
-│   │   └── response/
-│   │       ├── UserResponseDTO.java
-│   │       ├── PostResponseDTO.java
-│   │       └── AuthResponseDTO.java
-│   │
-│   ├── mapper/
-│   │   ├── UserMapper.java
-│   │   ├── PostMapper.java
-│   │   └── PaymentMapper.java
-│   │
-│   ├── service/
-│   │   ├── AuthService.java
-│   │   ├── UserService.java
-│   │   ├── PostService.java
-│   │   ├── PaymentService.java
-│   │   └── NotificationService.java
-│   │
-│   └── usecase/
-│       ├── CreateUserUseCase.java
-│       ├── CreatePostUseCase.java
-│       └── LikePostUseCase.java
+│   │   └── enums/
+│   │       ├── Role.java
+│   │       ├── MediaType.java
 │
-├── infrastructure/
-│   ├── database/
-│   │   ├── repository/
-│   │   └──├── UserRepository.java
-│   │      ├── PostRepository.java
-│   │      └── PaymentRepository.java
-│   │   
-│   │
-│   ├── security/
-│   │   ├── SecurityConfig.java
-│   │   ├── JwtService.java
-│   │   ├── JwtFilter.java
-│   │   ├── CustomUserDetails.java
-│   │   └── CustomUserDetailsService.java
-│   │
-│   ├── config/
-│   │   ├── CorsConfig.java
-│   │   ├── CacheConfig.java
-│   │   ├── OpenApiConfig.java
-│   │   └── BeansConfig.java
-│   │
-│   ├── client/
-│   │   ├── email/
-│   │   │   ├── EmailClient.java
-│   │   │   └── SendGridEmailClient.java
+│   ├── application/
+│   │   ├── dto/
+│   │   │   ├── request/
+│   │   │   └── response/
 │   │   │
-│   │   ├── storage/
-│   │   │   ├── StorageClient.java
-│   │   │   └── S3StorageClient.java
+│   │   ├── mapper/
 │   │   │
-│   │   └── payment/
-│   │       ├── PaymentGatewayClient.java
-│   │       └── StripeClient.java
+│   │   └── service/
+│   │       ├── AuthService.java
+│   │       ├── UserService.java
+│   │       └── ...
 │
-├── delivery/
-│   ├── controller/
-│   │   ├── AuthController.java
-│   │   ├── UserController.java
-│   │   ├── PostController.java
-│   │   └── PaymentController.java
-│   │
-│   ├── advice/
-│   │   ├── GlobalExceptionHandler.java
-│   │   └── ErrorResponse.java
-│   │
-│   └── filter/
-│       └── RequestLoggingFilter.java
+│   ├── delivery/
+│   │   └── rest/
+│   │       ├── controller/
+│   │       │   ├── AuthController.java
+│   │       │   └── ...
+│   │       │
+│   │       ├── advice/
+│   │       │   ├── GlobalHandlerException.java
+│   │       │   ├── ResourceNotFoundException.java
+│   │       │   ├── InvalidCredentialsException.java
+│   │       │   ├── InvalidOrExpiredTokenException.java
+│   │       │   ├── ConflictException.java
+│   │       │   │
+│   │       │   └── dto/
+│   │       │       ├── FieldErrorDTO.java
+│   │       │       └── ResponseErrorsDTO.java
+│   │       │
+│   │       └── filter/
+│   │           └── RequestFilter.java
 │
-├── shared/
-│   ├── util/
-│   │   ├── DateUtils.java
-│   │   ├── PasswordEncoderUtil.java
-│   │   └── PaginationUtil.java
-│   │
-│   └── constants/
-│       ├── SecurityConstants.java
-│       └── AppConstants.java
+│   ├── infrastructure/
+│   │   ├── config/
+│   │   │   ├── SecurityConfig.java
+│   │   │   ├── JwtConfig.java
+│   │   │   ├── OpenApiConfig.java
+│   │   │   ├── InitUserConfig.java
+│   │   │   └── InitUserProperties.java
+│   │   │
+│   │   ├── security/
+│   │   │   ├── CustomUserDetailsService.java
+│   │   │   ├── CustomAccessDeniedHandler.java
+│   │   │   │
+│   │   │   └── jwt/
+│   │   │       ├── JwtService.java
+│   │   │       ├── JwtAuthFilter.java
+│   │   │       └── JwtAuthEntryPoint.java
+│   │   │
+│   │   ├── database/
+│   │   │   └── repository/
+│   │   │       ├── UserRepository.java
+│   │   │       ├── PostRepository.java
+│   │   │       └── ...
+│   │   │
+│   │   └── client/
+│   │       ├── email/
+│   │       └── storage/
 │
-└── resources/
-    ├── application.yml
-    ├── application-dev.yml
-    └── application-prod.yml
+│   ├── shared/
+│   │   └── (utils, constants, etc)
+│
+├── src/main/resources/
+│   ├── application.yml
+│   ├── application-dev.yml
+│   └── application-test.yml
+│
+├── docker/
+│   ├── Dockerfile
+│   ├── compose-dev.yaml
+│   └── compose-test.yaml
+│
+├── README.md
+├── HELP.md
+├── ARCHITECTURE.md
+├── TASKS.md
+├── pom.xml
+
+```

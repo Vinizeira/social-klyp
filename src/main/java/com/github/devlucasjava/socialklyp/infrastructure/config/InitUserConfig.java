@@ -1,7 +1,7 @@
 package com.github.devlucasjava.socialklyp.infrastructure.config;
 
 import com.github.devlucasjava.socialklyp.domain.entity.User;
-import com.github.devlucasjava.socialklyp.domain.enuns.Role;
+import com.github.devlucasjava.socialklyp.domain.enums.Role;
 import com.github.devlucasjava.socialklyp.infrastructure.database.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;

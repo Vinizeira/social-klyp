@@ -68,147 +68,104 @@ Infrastructure (DB, Security, Cache, Clients externos)
 ## 📁 Estrutura do Projeto
 
 ```
-social-klyp-backend/
+social-klyp/
 │
-├── src/main/java/com/socialklyp/
-│   │
-│   ├── SocialKlypApplication.java
-│   │
+├── src/main/java/com/github/devlucasjava/socialklyp/
+│
+│   ├── Application.java
+│
 │   ├── domain/
 │   │   ├── entity/
 │   │   │   ├── User.java
+│   │   │   ├── Profile.java
 │   │   │   ├── Post.java
 │   │   │   ├── Comment.java
 │   │   │   ├── Like.java
-│   │   │   ├── Payment.java
-│   │   │   ├── Notification.java
-│   │   │   └── ChatMessage.java
+│   │   │   ├── Follow.java
+│   │   │   ├── Media.java
 │   │   │
-│   │   ├── enums/
-│   │   │   ├── Role.java
-│   │   │   ├── PostVisibility.java
-│   │   │   ├── PaymentStatus.java
-│   │   │   └── NotificationType.java
-│   │   │
-│   │   └── exception/
-│   │       ├── DomainException.java
-│   │       ├── NotFoundException.java
-│   │       └── UnauthorizedException.java
-│   │
+│   │   └── enums/
+│   │       ├── Role.java
+│   │       ├── MediaType.java
+│
 │   ├── application/
 │   │   ├── dto/
 │   │   │   ├── request/
-│   │   │   │   ├── LoginRequestDTO.java
-│   │   │   │   ├── CreateUserDTO.java
-│   │   │   │   ├── CreatePostDTO.java
-│   │   │   │   ├── PaymentRequestDTO.java
-│   │   │   │   └── ChatMessageDTO.java
-│   │   │   │
 │   │   │   └── response/
-│   │   │       ├── UserResponseDTO.java
-│   │   │       ├── PostResponseDTO.java
-│   │   │       └── AuthResponseDTO.java
 │   │   │
 │   │   ├── mapper/
-│   │   │   ├── UserMapper.java
-│   │   │   ├── PostMapper.java
-│   │   │   └── PaymentMapper.java
 │   │   │
-│   │   ├── service/
-│   │   │   ├── AuthService.java
-│   │   │   ├── UserService.java
-│   │   │   ├── PostService.java
-│   │   │   ├── PaymentService.java
-│   │   │   ├── NotificationService.java
-│   │   │   └── ChatService.java
-│   │   │
-│   │   └── usecase/
-│   │       ├── CreateUserUseCase.java
-│   │       ├── CreatePostUseCase.java
-│   │       ├── LikePostUseCase.java
-│   │       └── SendChatMessageUseCase.java
-│   │
+│   │   └── service/
+│   │       ├── AuthService.java
+│   │       ├── UserService.java
+│   │       └── ...
+│
+│   ├── delivery/
+│   │   └── rest/
+│   │       ├── controller/
+│   │       │   ├── AuthController.java
+│   │       │   └── ...
+│   │       │
+│   │       ├── advice/
+│   │       │   ├── GlobalHandlerException.java
+│   │       │   ├── ResourceNotFoundException.java
+│   │       │   ├── InvalidCredentialsException.java
+│   │       │   ├── InvalidOrExpiredTokenException.java
+│   │       │   ├── ConflictException.java
+│   │       │   │
+│   │       │   └── dto/
+│   │       │       ├── FieldErrorDTO.java
+│   │       │       └── ResponseErrorsDTO.java
+│   │       │
+│   │       └── filter/
+│   │           └── RequestFilter.java
+│
 │   ├── infrastructure/
+│   │   ├── config/
+│   │   │   ├── SecurityConfig.java
+│   │   │   ├── JwtConfig.java
+│   │   │   ├── OpenApiConfig.java
+│   │   │   ├── InitUserConfig.java
+│   │   │   └── InitUserProperties.java
+│   │   │
+│   │   ├── security/
+│   │   │   ├── CustomUserDetailsService.java
+│   │   │   ├── CustomAccessDeniedHandler.java
+│   │   │   │
+│   │   │   └── jwt/
+│   │   │       ├── JwtService.java
+│   │   │       ├── JwtAuthFilter.java
+│   │   │       └── JwtAuthEntryPoint.java
+│   │   │
 │   │   ├── database/
 │   │   │   └── repository/
 │   │   │       ├── UserRepository.java
 │   │   │       ├── PostRepository.java
-│   │   │       └── PaymentRepository.java
-│   │   │
-│   │   ├── security/
-│   │   │   ├── SecurityConfig.java
-│   │   │   ├── JwtService.java          ← Nimbus JOSE + JWT (HS256/RS256)
-│   │   │   ├── JwtFilter.java
-│   │   │   ├── Argon2PasswordConfig.java
-│   │   │   ├── CustomUserDetails.java
-│   │   │   ├── CustomUserDetailsService.java
-│   │   │   └── oauth2/
-│   │   │       ├── GoogleOAuth2UserService.java
-│   │   │       └── OAuth2SuccessHandler.java
-│   │   │
-│   │   ├── config/
-│   │   │   ├── CorsConfig.java
-│   │   │   ├── CacheConfig.java
-│   │   │   ├── OpenApiConfig.java
-│   │   │   ├── BeansConfig.java
-│   │   │   └── WebSocketConfig.java
+│   │   │       └── ...
 │   │   │
 │   │   └── client/
 │   │       ├── email/
-│   │       │   ├── EmailClient.java
-│   │       │   └── SendGridEmailClient.java
-│   │       ├── storage/
-│   │       │   ├── StorageClient.java
-│   │       │   └── S3StorageClient.java
-│   │       └── payment/
-│   │           ├── PaymentGatewayClient.java
-│   │           └── StripeClient.java
-│   │
-│   ├── delivery/
-│   │   ├── controller/
-│   │   │   ├── AuthController.java
-│   │   │   ├── UserController.java
-│   │   │   ├── PostController.java
-│   │   │   └── PaymentController.java
-│   │   │
-│   │   ├── websocket/
-│   │   │   └── ChatController.java      ← STOMP @MessageMapping
-│   │   │
-│   │   ├── advice/
-│   │   │   ├── GlobalExceptionHandler.java
-│   │   │   └── ErrorResponse.java
-│   │   │
-│   │   └── filter/
-│   │       └── RequestLoggingFilter.java
-│   │
-│   └── shared/
-│       ├── util/
-│       │   ├── DateUtils.java
-│       │   ├── PasswordEncoderUtil.java
-│       │   └── PaginationUtil.java
-│       │
-│       └── constants/
-│           ├── SecurityConstants.java
-│           └── AppConstants.java
+│   │       └── storage/
 │
-├── src/test/java/com/socialklyp/
-│   ├── unit/
-│   │   ├── service/
-│   │   └── usecase/
-│   └── integration/
-│       ├── controller/
-│       └── repository/           ← Testcontainers (PostgreSQL)
+│   ├── shared/
+│   │   └── (utils, constants, etc)
 │
 ├── src/main/resources/
 │   ├── application.yml
 │   ├── application-dev.yml
-│   └── application-prod.yml
+│   └── application-test.yml
 │
 ├── docker/
 │   ├── Dockerfile
-│   └── docker-compose.yml
+│   ├── compose-dev.yaml
+│   └── compose-test.yaml
 │
-└── pom.xml
+├── README.md
+├── HELP.md
+├── ARCHITECTURE.md
+├── TASKS.md
+├── pom.xml
+
 ```
 
 ---

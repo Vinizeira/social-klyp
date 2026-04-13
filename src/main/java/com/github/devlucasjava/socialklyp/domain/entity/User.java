@@ -1,6 +1,6 @@
 package com.github.devlucasjava.socialklyp.domain.entity;
 
-import com.github.devlucasjava.socialklyp.domain.enuns.Role;
+import com.github.devlucasjava.socialklyp.domain.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

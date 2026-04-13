@@ -1,6 +1,6 @@
 package com.github.devlucasjava.socialklyp.application.dto.response.user;
 
-import com.github.devlucasjava.socialklyp.domain.enuns.Role;
+import com.github.devlucasjava.socialklyp.domain.enums.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;

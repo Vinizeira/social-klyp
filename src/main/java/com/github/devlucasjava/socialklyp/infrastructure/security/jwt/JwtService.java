@@ -1,7 +1,7 @@
 package com.github.devlucasjava.socialklyp.infrastructure.security.jwt;
 
 import com.github.devlucasjava.socialklyp.domain.entity.User;
-import com.github.devlucasjava.socialklyp.domain.enuns.Role;
+import com.github.devlucasjava.socialklyp.domain.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;

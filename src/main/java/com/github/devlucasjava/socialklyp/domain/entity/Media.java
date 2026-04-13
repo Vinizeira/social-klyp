@@ -1,6 +1,6 @@
 package com.github.devlucasjava.socialklyp.domain.entity;
 
-import com.github.devlucasjava.socialklyp.domain.enuns.MediaType;
+import com.github.devlucasjava.socialklyp.domain.enums.MediaType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
