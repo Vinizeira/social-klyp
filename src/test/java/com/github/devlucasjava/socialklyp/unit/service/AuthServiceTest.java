@@ -1,9 +1,13 @@
-package com.github.devlucasjava.socialklyp.application.service;
+package com.github.devlucasjava.socialklyp.unit.service;
 
-import com.github.devlucasjava.socialklyp.application.dto.request.auth.*;
+import com.github.devlucasjava.socialklyp.application.dto.request.auth.LoginDTO;
+import com.github.devlucasjava.socialklyp.application.dto.request.auth.RegisterDTO;
+import com.github.devlucasjava.socialklyp.application.dto.request.auth.UpdatePasswordDTO;
+import com.github.devlucasjava.socialklyp.application.dto.request.auth.VerifyPasswordDTO;
 import com.github.devlucasjava.socialklyp.application.dto.response.auth.JwtAuthDTO;
 import com.github.devlucasjava.socialklyp.application.dto.response.utils.BooleanDTO;
 import com.github.devlucasjava.socialklyp.application.mapper.UserMapper;
+import com.github.devlucasjava.socialklyp.application.service.AuthService;
 import com.github.devlucasjava.socialklyp.domain.entity.User;
 import com.github.devlucasjava.socialklyp.infrastructure.database.repository.UserRepository;
 import com.github.devlucasjava.socialklyp.infrastructure.security.jwt.JwtService;
@@ -22,7 +26,8 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {

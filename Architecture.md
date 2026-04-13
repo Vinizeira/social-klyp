@@ -2,187 +2,6 @@
 
 > Documento de referência técnica para o time de desenvolvimento.
 
----
-
-## 📦 pom.xml — Dependências principais
-
-```xml
-<properties>
-    <java.version>21</java.version>
-    <spring-boot.version>3.3.0</spring-boot.version>
-    <nimbus-jose.version>9.37.3</nimbus-jose.version>
-</properties>
-
-<dependencies>
-
-    <!-- Spring Boot Core -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-validation</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-actuator</artifactId>
-    </dependency>
-
-    <!-- Segurança -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-security</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-oauth2-client</artifactId>
-    </dependency>
-
-    <!-- JWT — Nimbus JOSE (biblioteca segura, sem legado) -->
-    <dependency>
-        <groupId>com.nimbusds</groupId>
-        <artifactId>nimbus-jose-jwt</artifactId>
-        <version>9.37.3</version>
-    </dependency>
-
-    <!-- Argon2 (incluso no spring-security-crypto) -->
-    <!-- spring-boot-starter-security já inclui; adicione bouncycastle se necessário -->
-    <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-jdk18on</artifactId>
-        <version>1.78.1</version>
-    </dependency>
-
-    <!-- WebSocket -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-websocket</artifactId>
-    </dependency>
-
-    <!-- Cache / Redis -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-redis</artifactId>
-    </dependency>
-
-    <!-- Banco de Dados -->
-    <dependency>
-        <groupId>org.postgresql</groupId>
-        <artifactId>postgresql</artifactId>
-        <scope>runtime</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.flywaydb</groupId>
-        <artifactId>flyway-core</artifactId>
-    </dependency>
-
-    <!-- Documentação -->
-    <dependency>
-        <groupId>org.springdoc</groupId>
-        <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-        <version>2.5.0</version>
-    </dependency>
-
-    <!-- Utilitários -->
-    <dependency>
-        <groupId>org.mapstruct</groupId>
-        <artifactId>mapstruct</artifactId>
-        <version>1.5.5.Final</version>
-    </dependency>
-    <dependency>
-        <groupId>org.projectlombok</groupId>
-        <artifactId>lombok</artifactId>
-        <optional>true</optional>
-    </dependency>
-
-    <!-- Testes -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-test</artifactId>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>spring-security-test</artifactId>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.testcontainers</groupId>
-        <artifactId>postgresql</artifactId>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.testcontainers</groupId>
-        <artifactId>junit-jupiter</artifactId>
-        <scope>test</scope>
-    </dependency>
-
-</dependencies>
-```
-
----
-
-## 🔐 JWT com Nimbus JOSE — Implementação
-
-```java
-// infrastructure/security/JwtService.java
-@Service
-public class JwtService {
-
-    private final MACSigner signer;
-    private final MACVerifier verifier;
-
-    @Value("${jwt.secret}")
-    private String secret;
-
-    @PostConstruct
-    public void init() throws JOSEException {
-        byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
-        OctetSequenceKey key = new OctetSequenceKey.Builder(keyBytes)
-                .algorithm(JWSAlgorithm.HS256)
-                .build();
-        this.signer = new MACSigner(key);
-        this.verifier = new MACVerifier(key);
-    }
-
-    public String generateToken(UserDetails userDetails) throws JOSEException {
-        JWSSigner signer = new MACSigner(secret.getBytes());
-
-        JWTClaimsSet claims = new JWTClaimsSet.Builder()
-                .subject(userDetails.getUsername())
-                .issueTime(new Date())
-                .expirationTime(Date.from(Instant.now().plusSeconds(900)))
-                .claim("roles", userDetails.getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority).toList())
-                .build();
-
-        SignedJWT signedJWT = new SignedJWT(
-                new JWSHeader(JWSAlgorithm.HS256), claims);
-        signedJWT.sign(signer);
-
-        return signedJWT.serialize();
-    }
-
-    public JWTClaimsSet validateToken(String token) throws ParseException, JOSEException {
-        SignedJWT signedJWT = SignedJWT.parse(token);
-        if (!signedJWT.verify(verifier)) {
-            throw new UnauthorizedException("Token inválido");
-        }
-        JWTClaimsSet claims = signedJWT.getJWTClaimsSet();
-        if (claims.getExpirationTime().before(new Date())) {
-            throw new UnauthorizedException("Token expirado");
-        }
-        return claims;
-    }
-}
-```
-
----
 
 ## 🔑 Argon2 — Configuração de Senha
 
@@ -310,7 +129,7 @@ cq.where(cb.equal(root.get("visibility"), PostVisibility.PUBLIC));
 
 ---
 
-## 📊 Actuator — Configuração
+## 📊 Actuator — Configuração/ LUCAS MEXE COM ESSA PARTE
 
 ```yaml
 # application.yml
@@ -336,76 +155,10 @@ info:
 
 ---
 
-## 🐳 Docker Compose
-
-```yaml
-# docker/docker-compose.yml
-version: "3.9"
-
-services:
-
-  app:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
-    ports:
-      - "8080:8080"
-    environment:
-      - SPRING_PROFILES_ACTIVE=prod
-      - DB_URL=jdbc:postgresql://postgres:5432/socialklyp
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - JWT_SECRET=${JWT_SECRET}
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: socialklyp
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  redis:
-    image: redis:7-alpine
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-volumes:
-  pgdata:
-```
-
-```dockerfile
-# docker/Dockerfile
-FROM eclipse-temurin:21-jre-alpine
-
-WORKDIR /app
-
-COPY target/*.jar app.jar
-
-EXPOSE 8080
-
-ENTRYPOINT ["java", \
-  "-XX:+UseVirtualThreads", \
-  "-jar", "app.jar"]
-```
 
 ---
 
-## 🧪 Estratégia de Testes
+## 🧪 Estratégia de Testes/ USAR MOCKITO 
 
 ### Unitários — Use Cases e Services
 ```java
@@ -429,45 +182,22 @@ class CreateUserUseCaseTest {
 }
 ```
 
-### Integração — Controllers com Testcontainers
-```java
-@Tag("integration")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Testcontainers
-class AuthControllerIT {
 
-    @Container
-    static PostgreSQLContainer<?> postgres =
-        new PostgreSQLContainer<>("postgres:16-alpine");
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-    }
-
-    @Test
-    void shouldReturnJwtOnValidLogin() {
-        // ...
-    }
-}
-```
 
 ---
 
-## 🌿 Fluxo Git
+## 🌿 Fluxo Git/ sempre crie branch para implementar algo  
 
 ```
-main
-├── feature/jwt-refactor
-├── feature/websocket-chat
-├── feature/google-oauth2
-├── feature/user-service
-└── feature/post-service
+dev
+├── feature-jwt-refactor
+├── feature-websocket-chat
+├── feature-google-oauth2
+├── feature-user-service
+└── feature-post-service
 ```
 
-**Convenção de commits (Conventional Commits):**
+**Convenção de commits (Conventional Commits):** IMPORTANTE
 
 ```
 feat: adiciona WebSocket para chat em tempo real
