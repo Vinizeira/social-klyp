@@ -2,88 +2,100 @@ package com.github.devlucasjava.socialklyp.infrastructure.security.jwt;
 
 import com.github.devlucasjava.socialklyp.domain.entity.User;
 import com.github.devlucasjava.socialklyp.domain.enuns.Role;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.Date;
-import java.util.Map;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class JwtService {
 
-    @Value("${jwt.secret}")
-    private String jwtSecret;
+    private final JwtEncoder jwtEncoder;
+    private final JwtDecoder jwtDecoder;
 
-    @Value("${jwt.expireIn}")
-    private long jwtExpireIn;
+    // Valores lidos de jwt.accessExpiration e jwt.refreshExpiration no application.yaml
+    @Value("${jwt.accessExpiration}")
+    private long accessExpiration;
 
-    @Value("${jwt.refreshExpireIn}")
-    private long refreshExpireIn;
+    @Value("${jwt.refreshExpiration}")
+    private long refreshExpiration;
 
-    private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-    }
-
-    private String generateToken(User user, Map<String, Object> claims, long expireIn) {
-
-        Instant now = Instant.now();
-
-        return Jwts.builder()
-                .id(user.getId().toString())
-                .subject(user.getUsername())
-                .claims(claims)
-                .issuedAt(Date.from(now))
-                .expiration(Date.from(now.plusSeconds(expireIn)))
-                .signWith(getSigningKey())
-                .compact();
-    }
-
-    private Claims extractClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
-    }
-
-    private boolean isTokenNotExpired(String token) {
-        return extractClaims(token).getExpiration().after(new Date());
-    }
-
-    public String extractUsername(String token) {
-        return extractClaims(token).getSubject();
-    }
-
-    public Instant extractExpiration(String token) {
-        return extractClaims(token).getExpiration().toInstant();
-    }
-
-    public boolean isValidToken(String token, User user) {
-        return extractUsername(token).equals(user.getUsername()) &&
-                isTokenNotExpired(token);
-    }
 
     public String generateAccessToken(User user) {
-        Map<String, Object> claims = Map.of(
-                "email", user.getUsername(),
-                "username", user.getUsername(),
-                "role", user.getRoles().stream().map(Role::name).toList()
-        );
-        return generateToken(user, claims, jwtExpireIn);
+        return buildToken(user, accessExpiration);
     }
 
     public String generateRefreshToken(User user) {
-        Map<String, Object> claims = Map.of(
-                "username", user.getUsername()
-        );
-        return generateToken(user, claims, refreshExpireIn);
+        return buildToken(user, refreshExpiration);
+    }
+
+//    private String buildToken(User user, long expirationSeconds) { // TODO: For Production
+//        Instant now = Instant.now();
+//
+//        List<String> roles = user.getRoles()
+//                .stream()
+//                .map(Role::name)
+//                .toList();
+//
+//        JwtClaimsSet claims = JwtClaimsSet.builder()
+//                .subject(user.getUsername())
+//                .issuedAt(now)
+//                .expiresAt(now.plusSeconds(expirationSeconds))
+//                .claim("email", user.getEmail())
+//                .claim("roles", roles)
+//                .build();
+//
+//        return jwtEncoder
+//                .encode(JwtEncoderParameters.from(claims))
+//                .getTokenValue();
+//    }
+
+    private String buildToken(User user, long expirationSeconds) { // TODO: For Development with HS256 explicit in header token
+        Instant now = Instant.now();
+
+        List<String> roles = user.getRoles()
+                .stream()
+                .map(Role::name)
+                .toList();
+
+        JwsHeader header = JwsHeader
+                .with(MacAlgorithm.HS256)
+                .build();
+
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .subject(user.getUsername())
+                .issuedAt(now)
+                .expiresAt(now.plusSeconds(expirationSeconds))
+                .claim("email", user.getEmail())
+                .claim("roles", roles)
+                .build();
+
+        return jwtEncoder
+                .encode(JwtEncoderParameters.from(header, claims))
+                .getTokenValue();
+
+    }
+
+
+    public Instant getExpirationToken(String token) {
+        return jwtDecoder.decode(token).getExpiresAt();
+    }
+
+    public boolean isTokenValid(String token, User user) {
+        try {
+            Jwt jwt = jwtDecoder.decode(token);
+            return jwt.getSubject().equals(user.getUsername());
+        } catch (JwtException e) {
+            return false;
+        }
+    }
+
+    public String extractSubject(String token) {
+        return jwtDecoder.decode(token).getSubject();
     }
 }

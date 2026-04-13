@@ -64,8 +64,8 @@ public class AuthService {
         return JwtAuthDTO.builder()
                 .token(accessToken)
                 .refreshToken(refreshToken)
-                .expiresIn(jwtService.extractExpiration(accessToken))
-                .refreshExpiresIn(jwtService.extractExpiration(refreshToken))
+                .expiresIn(jwtService.getExpirationToken(accessToken))
+                .refreshExpiresIn(jwtService.getExpirationToken(refreshToken))
                 .user(userMapper.toDTO(userSaved))
                 .build();
     }
@@ -87,19 +87,14 @@ public class AuthService {
                 .user(userMapper.toDTO(user))
                 .token(accessToken)
                 .refreshToken(refreshToken)
-                .expiresIn(jwtService.extractExpiration(accessToken))
-                .refreshExpiresIn(jwtService.extractExpiration(refreshToken))
+                .expiresIn(jwtService.getExpirationToken(accessToken))
+                .refreshExpiresIn(jwtService.getExpirationToken(refreshToken))
                 .build();
     }
 
-    public JwtAuthDTO refreshToken(String refreshToken) {
-        String username = jwtService.extractUsername(refreshToken);
-        User user = userRepository.findByUsernameOrEmail(username)
+    public JwtAuthDTO refreshToken(User request) {
+        User user = userRepository.findByUsernameOrEmail(request.getUsername())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-
-        if (!jwtService.isValidToken(refreshToken, user)) {
-            throw new InvalidOrExpiredTokenException();
-        }
 
         String newAccessToken = jwtService.generateAccessToken(user);
         String newRefreshToken = jwtService.generateRefreshToken(user);
@@ -108,8 +103,8 @@ public class AuthService {
                 .user(userMapper.toDTO(user))
                 .token(newAccessToken)
                 .refreshToken(newRefreshToken)
-                .expiresIn(jwtService.extractExpiration(newAccessToken))
-                .refreshExpiresIn(jwtService.extractExpiration(newRefreshToken))
+                .expiresIn(jwtService.getExpirationToken(newAccessToken))
+                .refreshExpiresIn(jwtService.getExpirationToken(newRefreshToken))
                 .build();
     }
 

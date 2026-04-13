@@ -42,7 +42,6 @@ class AuthServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
-
     private User user;
     private final UUID uuid = UUID.randomUUID();
 
@@ -55,6 +54,8 @@ class AuthServiceTest {
         user.setPassword("encoded-pass");
         user.setRoles(Set.of());
     }
+
+    // ---------------- REGISTER ----------------
 
     @Test
     void shouldRegisterUserSuccessfully() {
@@ -74,7 +75,9 @@ class AuthServiceTest {
 
         when(jwtService.generateAccessToken(user)).thenReturn("access-token");
         when(jwtService.generateRefreshToken(user)).thenReturn("refresh-token");
-        when(jwtService.extractExpiration(any())).thenReturn(Instant.now());
+
+        when(jwtService.getExpirationToken("access-token")).thenReturn(Instant.now());
+        when(jwtService.getExpirationToken("refresh-token")).thenReturn(Instant.now());
 
         when(userMapper.toDTO(user)).thenReturn(null);
 
@@ -84,6 +87,8 @@ class AuthServiceTest {
         assertEquals("access-token", response.getToken());
         assertEquals("refresh-token", response.getRefreshToken());
     }
+
+    // ---------------- LOGIN ----------------
 
     @Test
     void shouldLoginSuccessfully() {
@@ -100,7 +105,9 @@ class AuthServiceTest {
 
         when(jwtService.generateAccessToken(user)).thenReturn("access-token");
         when(jwtService.generateRefreshToken(user)).thenReturn("refresh-token");
-        when(jwtService.extractExpiration(any())).thenReturn(Instant.now());
+
+        when(jwtService.getExpirationToken("access-token")).thenReturn(Instant.now());
+        when(jwtService.getExpirationToken("refresh-token")).thenReturn(Instant.now());
 
         when(userMapper.toDTO(user)).thenReturn(null);
 
@@ -109,25 +116,29 @@ class AuthServiceTest {
         assertEquals("access-token", response.getToken());
     }
 
+    // ---------------- REFRESH TOKEN ----------------
+
     @Test
     void shouldRefreshTokenSuccessfully() {
 
-        when(jwtService.extractUsername("refresh")).thenReturn("lucas");
         when(userRepository.findByUsernameOrEmail("lucas"))
                 .thenReturn(Optional.of(user));
 
-        when(jwtService.isValidToken(any(), eq(user))).thenReturn(true);
-
         when(jwtService.generateAccessToken(user)).thenReturn("new-access");
         when(jwtService.generateRefreshToken(user)).thenReturn("new-refresh");
-        when(jwtService.extractExpiration(any())).thenReturn(Instant.now());
+
+        when(jwtService.getExpirationToken("new-access")).thenReturn(Instant.now());
+        when(jwtService.getExpirationToken("new-refresh")).thenReturn(Instant.now());
 
         when(userMapper.toDTO(user)).thenReturn(null);
 
-        JwtAuthDTO response = authService.refreshToken("refresh");
+        JwtAuthDTO response = authService.refreshToken(user);
 
         assertEquals("new-access", response.getToken());
+        assertEquals("new-refresh", response.getRefreshToken());
     }
+
+    // ---------------- UPDATE PASSWORD ----------------
 
     @Test
     void shouldUpdatePasswordSuccessfully() {
@@ -144,6 +155,8 @@ class AuthServiceTest {
 
         verify(userRepository).save(user);
     }
+
+    // ---------------- VERIFY PASSWORD ----------------
 
     @Test
     void shouldReturnTrueWhenPasswordIsValid() {

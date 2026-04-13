@@ -9,6 +9,7 @@ import com.github.devlucasjava.socialklyp.application.dto.response.utils.Boolean
 import com.github.devlucasjava.socialklyp.application.service.AuthService;
 import com.github.devlucasjava.socialklyp.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,16 +44,18 @@ public class AuthController {
 
     @PostMapping("/refresh-token")
     @Operation(summary = "Refresh access token using refresh token")
+    @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<JwtAuthDTO> refreshToken(
-            @RequestHeader("RefreshToken") String token
+            @AuthenticationPrincipal User user
     ) {
-        JwtAuthDTO response = authService.refreshToken(token);
+        JwtAuthDTO response = authService.refreshToken(user);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/verify-password")
     @Operation(summary = "Verify user password")
+    @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<BooleanDTO> verifyPassword(
             @AuthenticationPrincipal User user,
@@ -63,6 +66,7 @@ public class AuthController {
 
     @PutMapping("/password")
     @PreAuthorize("hasRole('USER')")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Update user password")
     public ResponseEntity<Void> updatePassword(
             @AuthenticationPrincipal User user,

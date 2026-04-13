@@ -17,15 +17,21 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
 
 server:
   port: 8888
-  servlet:
-#    context-path:
+
 jwt:
-  secret: mySecretKey123456789012345678901234567890mySecretKey123456789012345678901234567890
-  expireIn: 3600
-  refreshExpireIn: 7200
+  secret: c29jaWFsLWtseWAA==c29jaWFsLWtseWAA==c29jaWFsLWtseWAA==c29jaWFsLWtseWAA==c29jaWFsLWtseWAA==c29jaWFsLWtseWAA==c29jaWFsLWtseWAA==c29jaWFsLWtseWAA==c29jaWFsLWtseWAA==c29jaWFsLWtseWAA==
+  accessExpiration: 3600
+  refreshExpiration: 7200
+
+cors:
+  allowed-origins: "http://localhost:3000,*"
 
 app:
   init-user:
@@ -33,3 +39,26 @@ app:
     username: admin
     email: admin@socialklyp.com
     password: 12345678
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Social Klyp Backend
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
