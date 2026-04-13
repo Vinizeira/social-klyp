@@ -3,8 +3,8 @@ spring:
     name: social-klyp
 
 # if use docker compose comment, or use intellij user profile dev, test or prod
-#  profiles:
-#    active: dev
+  profiles:
+    active: test
 
 server:
   port: 8888
